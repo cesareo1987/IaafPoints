@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/GlaivePro/IaafPoints/releases/tag/1.2.3)
+### Added
+- Classifier `latvian2026`.
+
+### Changed
+- Hand time exception logic. WA points up to 2022 edition should not be affected.
+
 ## [1.2.3](https://github.com/GlaivePro/IaafPoints/releases/tag/1.2.3)
 ### Added
 - PHP 8.5 support.
