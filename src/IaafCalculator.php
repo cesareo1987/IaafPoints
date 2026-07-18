@@ -11,7 +11,8 @@ class IaafCalculator extends Support\Calculator
 	 *  + edition - string - use getSupportedEditionKeys() method for array of available options
 	 *  + gender - 'f' or 'm'
 	 *  + electronicMeasurement = true or false
-	 *  + venueType - 'indoor' or 'outdoor'
+	 *  + venueType - 'indoor' or 'outdoor' --- for 2017 and 2022 editions only
+	 *  + trackType - 'long' or 'short' --- for 2025 and later editions only
 	 *	+ discipline - string - after setting other options use getSupportedDisciplineKeys() method for array of available options
 	 */
 	protected $options = [
@@ -19,6 +20,7 @@ class IaafCalculator extends Support\Calculator
 		'gender' => 'm',
 		'electronicMeasurement' => true,
 		'venueType' => 'outdoor',
+		'trackType' => 'long',
 		'edition' => '2022',
 	];
 
@@ -35,7 +37,13 @@ class IaafCalculator extends Support\Calculator
 		if (!$discipline)
 			return;
 
-		$constants = $this->constants()[$discipline] ?? null;
+		$constants = $this->constants();
+
+		// short track twins like `200m_short` exist only where the track length matters
+		if ('short' === $this->options['trackType'] && isset($constants[$discipline.'_short']))
+			$discipline .= '_short';
+
+		$constants = $constants[$discipline] ?? null;
 
 		if (!$constants)
 			return;
@@ -62,16 +70,26 @@ class IaafCalculator extends Support\Calculator
 
 		if (!$this->options['electronicMeasurement'])  //hand time corrections
 		{
-			//For sprints & hurdles up to 200m
-			if (in_array($this->options['discipline'], ['50m', '55m', '60m', '100m', '200m', '50mh', '55mh', '60mh', '100mh', '110mh']))
+			// the correction is the same whether the track is short or long
+			$discipline = preg_replace('/_short$/', '', $this->options['discipline']);
+
+			// For sprints & hurdles up to 200m
+			if (in_array($discipline, ['50m', '55m', '60m', '100m', '200m', '50mh', '55mh', '60mh', '100mh', '110mh']))
 				$result += 0.24;
 
-			//For sprints & hurdles up to 400m
-			if (in_array($this->options['discipline'], ['300m', '400m', '300mh', '400mh']))
+			/**
+			 * For sprints & hurdles up to 400m
+			 *
+			 * Note that the WA Scoring tables' book instructs to only apply
+			 * this correction 300m, 400m, 400mh, but the author of this
+			 * package got confirmation from WA via email on 2026-06-01 that
+			 * it's a typo and this correction must be applied to 300mh as well.
+			 */
+			if (in_array($discipline, ['300m', '400m', '300mh', '400mh']))
 				$result += 0.14;
 
 			// The correction for 500m has been removed in the 2025 edition.
-			if (in_array($this->options['edition'], ['2017', '2022']) && $this->options['discipline'] === '500m')
+			if (in_array($this->options['edition'], ['2017', '2022']) && $discipline === '500m')
 				$result += 0.14;
 		}
 
@@ -104,6 +122,10 @@ class IaafCalculator extends Support\Calculator
 		$gender = $this->options['gender'];
 
 		$constants = $this->constants->edition($edition);
+
+		// since the 2025 edition the tables are flat, short track events have their own keys
+		if (!in_array($edition, ['2017', '2022']))
+			return $constants[$gender] ?? [];
 
 		return $constants[$venueType][$gender] ?? [];
 	}

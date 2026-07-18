@@ -165,12 +165,23 @@ following options with the defaults as set here:
 	'gender' => 'm',
 	// Whether electronic measurement or hand time was used.
 	'electronicMeasurement' => true,
-	// Venue type: 'outdoor' or 'indoor'.
+	// Venue type: 'outdoor' or 'indoor'. Used by the '2017' and '2022' editions.
 	'venueType' => 'outdoor',
-	// Edition, only '2017' is supported at the moment of writing.
-	'edition' => '2017',
+	// Track type: 'long' or 'short'. Used by the '2025' and later editions.
+	'trackType' => 'long',
+	// Edition: '2017', '2022' or '2025'.
+	'edition' => '2022',
 ];
 ```
+
+Since the 2025 edition WA no longer splits the tables by venue. Instead, the
+events where the track length matters (200m, 400m, 800m, relays etc.) have a
+separate short track "events". Set `'trackType' => 'short'` when the race was
+run on a short (typically indoor-sized) track. The calculator will use the
+`_short` twin of the discipline where one exists and fall back to the common
+discipline where the track length makes no difference (60m, field events etc.).
+
+You may also request a short track table explicitly: `'discipline' => '200m_short'`.
 
 ### GlaivePro\IaafPoints\CombinedCalculator
 

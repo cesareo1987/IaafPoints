@@ -36,7 +36,7 @@ This package provides mutliple calculators that all provide the same interface.
 // Calculator and use-case specific options.
 $options = [
 	'gender' => 'm',
-	'venueType' => 'outdoor',
+	'trackType' => 'long',
 	'discipline' => '200m',
 ];
 

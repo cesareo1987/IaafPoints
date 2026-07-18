@@ -118,6 +118,17 @@ class IaafCalculatorTest extends TestCase
 		$points = $this->calculator->evaluate($result);
 		$this->assertEquals(346, $points);
 
+		// Trigger the .14 correction on 500m — it applies up to the 2022 edition...
+		$this->calculator->setOptions(['discipline' => '500m']);
+		$points = $this->calculator->evaluate(69.0);
+		$this->assertEquals(767, $points);
+
+		// ...but not since the 2025 edition
+		$this->calculator->setOptions(['edition' => '2025']);
+		$points = $this->calculator->evaluate(69.0);
+		$this->assertEquals(716, $points);
+		$this->calculator->setOptions(['edition' => '2017']);
+
 		// Result worse than reference result
 		$result = 59.0;
 		$this->calculator->setOptions(['discipline' => '300m']);
