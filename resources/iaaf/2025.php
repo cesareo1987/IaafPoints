@@ -13,6 +13,33 @@ $mixedRelays = [
 	],
 ];
 
+$longDistanceRuns = [
+	'm' => [
+		'5km' => [
+			'resultShift' => -1440,
+			'conversionFactor' => 0.002778,
+			'pointShift' => 0,
+		],
+		'10km' => [
+			'resultShift' => -3150,
+			'conversionFactor' => 0.000524,
+			'pointShift' => 0,
+		],
+	],
+	'f' => [
+		'5km' => [
+			'resultShift' => -2100,
+			'conversionFactor' => 0.000808,
+			'pointShift' => 0,
+		],
+		'10km' => [
+			'resultShift' => -4500,
+			'conversionFactor' => 0.0001712,
+			'pointShift' => 0,
+		],
+	],
+];
+
 /**
  * WA scoring tables, 2025 edition.
  *
@@ -183,21 +210,13 @@ return [
 			'conversionFactor' => 0.00721,
 			'pointShift' => 0,
 		],
-		'5000m' => [
-			'resultShift' => -1440,
-			'conversionFactor' => 0.002778,
-			'pointShift' => 0,
-		],
+		'5000m' => $longDistanceRuns['m']['5km'],
 		'5000m_short' => [
 			'resultShift' => -1440,
 			'conversionFactor' => 0.0029,
 			'pointShift' => 0,
 		],
-		'10000m' => [
-			'resultShift' => -3150,
-			'conversionFactor' => 0.000524,
-			'pointShift' => 0,
-		],
+		'10000m' => $longDistanceRuns['m']['10km'],
 		'110mh' => [
 			'resultShift' => -25.8,
 			'conversionFactor' => 7.66,
@@ -248,17 +267,10 @@ return [
 			'conversionFactor' => 0.0489,
 			'pointShift' => 0,
 		],
-		...$mixedRelays,
-		'5km' => [
-			'resultShift' => -1440,
-			'conversionFactor' => 0.002778,
-			'pointShift' => 0,
-		],
-		'10km' => [
-			'resultShift' => -3150,
-			'conversionFactor' => 0.000524,
-			'pointShift' => 0,
-		],
+		'mixed_4x400m' => $mixedRelays['mixed_4x400m'],
+		'mixed_4x400m_short' => $mixedRelays['mixed_4x400m_short'],
+		'5km' => $longDistanceRuns['m']['5km'],
+		'10km' => $longDistanceRuns['m']['10km'],
 		'15km' => [
 			'resultShift' => -4868,
 			'conversionFactor' => 0.0002162,
@@ -596,21 +608,13 @@ return [
 			'conversionFactor' => 0.002202,
 			'pointShift' => 0,
 		],
-		'5000m' => [
-			'resultShift' => -2100,
-			'conversionFactor' => 0.000808,
-			'pointShift' => 0,
-		],
+		'5000m' => $longDistanceRuns['f']['5km'],
 		'5000m_short' => [
 			'resultShift' => -2100,
 			'conversionFactor' => 0.000825,
 			'pointShift' => 0,
 		],
-		'10000m' => [
-			'resultShift' => -4500,
-			'conversionFactor' => 0.0001712,
-			'pointShift' => 0,
-		],
+		'10000m' => $longDistanceRuns['f']['10km'],
 		'100mh' => [
 			'resultShift' => -30,
 			'conversionFactor' => 3.98,
@@ -661,17 +665,10 @@ return [
 			'conversionFactor' => 0.0155,
 			'pointShift' => 0,
 		],
-		...$mixedRelays,
-		'5km' => [
-			'resultShift' => -2100,
-			'conversionFactor' => 0.000808,
-			'pointShift' => 0,
-		],
-		'10km' => [
-			'resultShift' => -4500,
-			'conversionFactor' => 0.0001712,
-			'pointShift' => 0,
-		],
+		'mixed_4x400m' => $mixedRelays['mixed_4x400m'],
+		'mixed_4x400m_short' => $mixedRelays['mixed_4x400m_short'],
+		'5km' => $longDistanceRuns['f']['5km'],
+		'10km' => $longDistanceRuns['f']['10km'],
 		'15km' => [
 			'resultShift' => -7289,
 			'conversionFactor' => 0.0000595,
