@@ -21,7 +21,7 @@ class IaafCalculator extends Support\Calculator
 		'electronicMeasurement' => true,
 		'venueType' => 'outdoor',
 		'trackType' => 'long',
-		'edition' => '2022',
+		'edition' => '2025',
 	];
 
 	protected $resultShift;
@@ -105,6 +105,115 @@ class IaafCalculator extends Support\Calculator
 			return 0;
 
 		return floor($points);
+	}
+
+	/**
+	 * Calculo de la marca que corresponden a unos puntos concretos mediante formula
+	 *
+	 * @param int $points
+	 *
+	 * @return float|null
+	 */
+	public function resultFromPointsRaw(int $points): ?float
+	{
+		if ($points <= 0) {
+			return null;
+		}
+
+		if (
+			null === $this->resultShift ||
+			null === $this->conversionFactor ||
+			null === $this->pointShift
+		) {
+			return null;
+		}
+
+		if (!$this->options['electronicMeasurement']) {
+			throw new \LogicException(
+				'resultFromPointsRaw() currently supports electronic timing only.'
+			);
+		}
+
+		/*
+		* evaluate() does:
+		*
+		* points = floor(
+		*     conversionFactor * (result + resultShift)^2
+		*     + pointShift)
+		*
+		*/
+
+		$value = ($points - $this->pointShift) / $this->conversionFactor;
+
+		if ($value < 0) {
+			return null;
+		}
+
+		$root = sqrt($value);
+
+		/*
+		* Running events use the negative branch.
+		* Field/combined events use the positive branch.
+		*/
+		if ($this->resultShift < 0) {
+			return -$this->resultShift - $root;
+		}
+
+		return -$this->resultShift + $root;
+	}
+
+	/**
+	 * Busca resultado exacto para esos puntos concretos
+	 * 
+	 * Retorna null si no se puede representar con la precision dada
+	 *
+	 */
+	public function resultFromPoints(
+		int $points,
+		int $decimals = 2
+	): ?float {
+		$rawResult = $this->resultFromPointsRaw($points);
+
+		if ($rawResult === null) {
+			return null;
+		}
+
+		$step = 10 ** (-$decimals);
+
+		$baseResult = round($rawResult, $decimals);
+
+		/*
+		* Usually the rounded value itself is correct.
+		* Check a few neighbouring values as well because floor()
+		* can make some boundaries awkward.
+		*/
+		for ($offset = 0; $offset <= 3; ++$offset) {
+			$candidates = $offset === 0
+				? [$baseResult]
+				: [
+					$baseResult - ($offset * $step),
+					$baseResult + ($offset * $step),
+				];
+
+			foreach ($candidates as $candidate) {
+				$candidate = round($candidate, $decimals);
+
+				if ($candidate <= 0) {
+					continue;
+				}
+
+				$calculatedPoints = $this->evaluate($candidate);
+
+				if (
+					$calculatedPoints !== null &&
+					(int) $calculatedPoints === $points
+				) {
+					return $candidate;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
