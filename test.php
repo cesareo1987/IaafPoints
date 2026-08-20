@@ -10,18 +10,18 @@ require __DIR__ . '/vendor/autoload.php';
 use GlaivePro\IaafPoints\IaafCalculator;
 use GlaivePro\IaafPoints\PerformanceParser;
 use GlaivePro\IaafPoints\ReferenceScoringTable;
+use GlaivePro\IaafPoints\Fam\EquivalentDistanceCalculator;
 
 $calculator = new IaafCalculator([
     'edition'    => '2025',
     'gender'     => 'm',
     'trackType'  => 'long',
-    'discipline' => '800m',
+    'discipline' => '3000mW',
     'electronicMeasurement' => true,
 ]);
 
 // Calculadora especifica marca -> puntos
-
-$marca_string = "1:52.00";
+$marca_string = "12:31.01";
 $marca = PerformanceParser::parse($marca_string);
 $puntos = $calculator->evaluate($marca);
 
@@ -32,10 +32,11 @@ printf(
     $puntos
 );
 
+
 echo "\n";
 
-// Busqueda concreta contra la tabla real en JSON
 
+// Busqueda concreta contra la tabla real en JSON
 $table = new ReferenceScoringTable(
      'resources/iaaf/wa-scoring-2025.json'
 );
@@ -64,6 +65,7 @@ printf(
     $puntos
 );
 
+
 echo "\n";
 
 
@@ -75,3 +77,23 @@ $mark = $calculator->resultFromPoints($points, 2);
 echo "Puntos: {$points}\n";
 echo "Marca: " . number_format($mark, 2, '.', '') . "\n";
 echo "Comprobación: " . $calculator->evaluate($mark) . " puntos\n";
+
+echo "\n";
+
+// Calculo de eventos que no existen en las tablas IAAF
+$calculator = new EquivalentDistanceCalculator([
+    'edition' => '2025',
+    'gender' => 'm',
+    'trackType' => 'long',
+    'discipline' => '2000mW',
+    'electronicMeasurement' => true,
+]);
+
+$marca = PerformanceParser::parse("10:00.00");
+$points = $calculator->evaluate($marca);
+
+echo $points;
+
+$equivalent = $calculator->equivalent($marca);
+
+print_r($equivalent);
